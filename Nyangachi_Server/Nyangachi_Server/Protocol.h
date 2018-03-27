@@ -1,6 +1,9 @@
 #pragma once
 #include "stdafx.h"
 
+#define		MAX_PACKET_SIZE			256
+#define		SERVER_PORT				9000
+
 #pragma pack(push, 1)
 
 struct HEADER {
