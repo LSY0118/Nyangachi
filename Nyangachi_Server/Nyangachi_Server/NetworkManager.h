@@ -3,9 +3,15 @@
 #include "Protocol.h"
 #include "Player.h"
 
+enum class OP_TYPE {
+	OP_SEND = 0,
+	OP_RECV
+};
+
 class SockInfo {
 	WSAOVERLAPPED				m_Overlapped;
 	WSABUF						m_WSABuf;
+	OP_TYPE						m_operationType;
 	SOCKET						m_Sock;
 	char						m_IOBuf[MAX_PACKET_SIZE];
 	char						m_packetBuf[MAX_PACKET_SIZE];
@@ -20,6 +26,7 @@ public:
 
 	WSAOVERLAPPED&	getOvelappedStruct() { return m_Overlapped; }
 	WSABUF&			getWSABuf() { return m_WSABuf; }
+	OP_TYPE&		getOperationType() { return m_operationType; }
 	char*			getIOBuf() { return m_IOBuf; }
 	char*			getPacketBuf() { return m_packetBuf; }
 	int&			getStoredPacketSize() { return m_nstoredPacketSize; }
@@ -40,14 +47,22 @@ public:
 
 class CNetworkManager
 {
-	vector<thread*>					m_vThreadList;
-	concurrent_vector<SockInfo*>	m_vClientInfo;
+	vector<thread*>					m_vpThreadList;
+	concurrent_vector<SockInfo*>	m_vpClientInfo;
 	HANDLE							m_hIOCP;
 	SOCKET							m_listenSock;
+	UINT							m_nID;
 
 public:
 	CNetworkManager();
 	~CNetworkManager();
+
+	UINT getID() {
+		m_IDLock.lock();
+		UINT tmp = m_nID++;
+		m_IDLock.unlock();
+		return tmp;
+	}
 
 	void initNetwork();
 	void startServer();
@@ -68,5 +83,6 @@ public:
 	//오류 출력 함수
 	void err_quit(char *msg);
 	void err_display(char *msg);
+	bool syncData(void *buf, int id);
 };
 
