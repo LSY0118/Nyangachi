@@ -11,6 +11,7 @@
 #include <vector>
 #include <assert.h>
 #include <concurrent_vector.h>
+#include <mutex>
 #include <list>
 #include <set>
 
