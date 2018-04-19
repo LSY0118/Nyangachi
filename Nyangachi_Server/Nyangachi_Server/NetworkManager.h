@@ -52,6 +52,7 @@ class CNetworkManager
 	HANDLE							m_hIOCP;
 	SOCKET							m_listenSock;
 	UINT							m_nID;
+	mutex							m_IDLock;
 
 public:
 	CNetworkManager();

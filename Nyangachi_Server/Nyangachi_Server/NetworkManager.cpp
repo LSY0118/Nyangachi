@@ -101,6 +101,7 @@ void CNetworkManager::startServer()
 	m_vpThreadList.push_back(new thread{ mem_fun(&CNetworkManager::acceptThread), this });
 }
 
+// bind, listen, accept, recv
 bool CNetworkManager::acceptThread()
 {
 	//listenSock생성
@@ -193,7 +194,7 @@ void  CNetworkManager::workerThread()
 		//cout << "io 작업 완료" << endl;
 
 		// 접속 종료 처리
-		if (0 == IOsize)
+		if (IOsize == 0)
 		{
 			auto sockdata = m_vpClientInfo[key];
 			m_vpClientInfo[key] = nullptr;
@@ -208,10 +209,10 @@ void  CNetworkManager::workerThread()
 			unsigned restData = IOsize;
 			char * recvbuf = sockInfo->getIOBuf();
 
-			while (0 < restData)
+			while (restData > 0)
 			{
 				//현재 처리하는 패킷이 없을 경우
-				if (0 == sockInfo->getCurPacketSize())
+				if (sockInfo->getCurPacketSize() == 0)
 				{
 					//iobuf의 첫번째 값을 패킷 사이즈로 가져온다.
 					UCHAR *size = reinterpret_cast<UCHAR*>(recvbuf);
