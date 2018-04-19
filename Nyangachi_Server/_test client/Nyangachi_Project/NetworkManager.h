@@ -1,11 +1,16 @@
 #pragma once
+
+#include "..\..\Nyangachi_Server\Protocol.h"
+#include "stdafx.h"
+#include "Object.h"
+
 class CNetworkManager
 {
 public:
 	SOCKET				m_ClientSock;
-	CHAR				m_Sendbuf[BUFSIZE];
-	CHAR				m_Recvbuf[BUFSIZE];
-	CHAR				m_Packbuf[BUFSIZE];
+	CHAR				m_Sendbuf[MAX_PACKET_SIZE];
+	CHAR				m_Recvbuf[MAX_PACKET_SIZE];
+	CHAR				m_Packbuf[MAX_PACKET_SIZE];
 	thread				*m_pTransmitthread;
 	WSABUF				m_wsaSendbuf;
 	WSABUF				m_wsaRecvbuf;

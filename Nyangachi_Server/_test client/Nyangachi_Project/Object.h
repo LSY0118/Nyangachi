@@ -73,6 +73,7 @@ public:
 
 class CPlayer : public CGameObject
 {
+	BYTE		m_byState;
 public:
 	CPlayer();
 	virtual ~CPlayer();
@@ -103,6 +104,14 @@ public:
 	XMFLOAT3 GetMovingDirection();
 
 	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
+
+	// 네트워크
+	//POINT& getPos() { return m_Position; }
+	BYTE& getState() { return m_byState; }
+
+	//void setPos(const POINT& pos) { m_Position = pos; }
+	void setState(const BYTE &state) { m_byState = state; }
+	//void Move(POINT& posDelta);
 };
 
 class CTestObj : public CGameObject

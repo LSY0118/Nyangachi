@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "NetworkManager.h"
 
 SockInfo::SockInfo() {
@@ -50,7 +51,6 @@ void CNetworkManager::err_quit(char *msg)
 		NULL, WSAGetLastError(),
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR)&lpMsgBuf, 0, NULL);
-	TCHAR tmp[100];
 
 	MessageBox(NULL, (LPCTSTR)lpMsgBuf, msg, MB_ICONERROR);
 	LocalFree(lpMsgBuf);
@@ -71,7 +71,7 @@ void CNetworkManager::err_display(char *msg)
 
 void CNetworkManager::initNetwork()
 {
-	//_wsetlocale(LC_ALL, L"korean");
+	_wsetlocale(LC_ALL, L"korean");
 
 	for (int i = 0; i < RESERVE_ID_CNT; ++i)
 	{
@@ -160,7 +160,7 @@ bool CNetworkManager::acceptThread()
 
 		CreateIoCompletionPort((HANDLE)clientSock, m_hIOCP, tmpSock->getSockID(), 0);
 
-		cout << "클라이언트 접속 완료 " << tmpSock->getSockID() << endl;
+		cout << "클라이언트" << tmpSock->getSockID() << " 접속 완료" << endl;
 
 		//해당 소켓을 Recv상태로 바꿔줌
 		retval = WSARecv(clientSock, &tmpSock->getWSABuf(), 1, NULL, &flags, reinterpret_cast<LPOVERLAPPED>(tmpSock), NULL);
@@ -199,7 +199,7 @@ void  CNetworkManager::workerThread()
 			auto sockdata = m_vpClientInfo[key];
 			m_vpClientInfo[key] = nullptr;
 			delete sockdata;
-			cout << "클라이언트 접속종료" << endl;
+			cout << "클라이언트" << key << " 접속 종료" << endl;
 			Logout(nullptr, key);
 			continue;
 		}
@@ -296,11 +296,225 @@ bool CNetworkManager::packetProcess(CHAR* buf, int id)
 	switch (buf[1])
 	{
 	case PAK_SYNC:
-		issuccess = syncData(buf, id);
+		//issuccess = syncData(buf, id);
 		break;
 	case PAK_ID:
 		issuccess = Login(buf, id);
 		break;
 	}
 	return issuccess;
+}
+
+bool CNetworkManager::Login(void *buf, int id)
+{
+	//cout << "로그인 패킷" << endl;
+	UCHAR sendData[MAX_PACKET_SIZE] = { 0 };
+
+	HEADER *phead = reinterpret_cast<HEADER*>(sendData);
+	phead->byPacketID = PAK_ID;
+	phead->ucSize = sizeof(SC_ID) + sizeof(HEADER);
+
+	SC_ID *pdata = reinterpret_cast<SC_ID*>(sendData + sizeof(HEADER));
+	pdata->ID = id;
+
+	transmitProcess(sendData, id);
+
+	//다른 플레이어에게 내 정보 전송
+	phead->byPacketID = PAK_REG;
+	phead->ucSize = sizeof(SC_SYNC) + sizeof(HEADER);
+
+	//SC_SYNC *pdata1 = reinterpret_cast<SC_SYNC*>(sendData + sizeof(HEADER));
+	//pdata1->ID = id;
+	//pdata1->position = m_vpClientInfo[id]->getPlayer()->getPos();
+	for (auto &data : m_vpClientInfo)
+	{
+		if (data)
+		{
+
+			transmitProcess(sendData, data->getSockID());
+		}
+	}
+
+	//phead = reinterpret_cast<HEADER*>(sendData);
+	//phead->byPacketID = PAK_REG;
+	//phead->ucSize = sizeof(SC_SYNC) + sizeof(HEADER);
+
+	//SC_SYNC *pdata2 = reinterpret_cast<SC_SYNC*>(sendData + sizeof(HEADER));
+
+
+	//for (int i = 0; i < RESERVE_ID_CNT; ++i)
+	//{
+	//	if (!m_vpClientInfo[i]) continue;
+	//	if (id == i) continue;
+	//	if (!inRange(id, i)) continue;
+
+	//	m_vpClientInfo[id]->m_vlLock.lock();
+	//	m_vpClientInfo[id]->m_setViewList.insert(i);
+	//	m_vpClientInfo[id]->m_vlLock.unlock();
+
+	//	pdata2->ID = m_vpClientInfo[i]->getSockID();
+	//	pdata2->position = m_vpClientInfo[i]->getPlayer()->getPos();
+
+	//	transmitProcess(sendData, id);
+	//}
+
+
+	//m_vpClientInfo[id]->m_vlLock.lock();
+	//for (auto iter : m_vpClientInfo[id]->m_setViewList)
+	//{
+	//	if (!m_vpClientInfo[iter]) continue;
+	//	if (id == iter) continue;
+
+	//	m_vpClientInfo[iter]->m_vlLock.lock();
+	//	m_vpClientInfo[iter]->m_setViewList.insert(id);
+	//	m_vpClientInfo[iter]->m_vlLock.unlock();
+
+	//	pdata2->ID = m_vpClientInfo[id]->getSockID();
+	//	pdata2->position = m_vpClientInfo[id]->getPlayer()->getPos();
+
+	//	transmitProcess(sendData, iter);
+	//}
+	//m_vpClientInfo[id]->m_vlLock.unlock();
+	return true;
+}
+
+bool CNetworkManager::Logout(void *buf, int id)
+{
+	//cout << "로그인 패킷" << endl;
+	UCHAR sendData[MAX_PACKET_SIZE] = { 0 };
+
+	HEADER *phead = reinterpret_cast<HEADER*>(sendData);
+	phead->byPacketID = PAK_RMV;
+	phead->ucSize = sizeof(SC_ID) + sizeof(HEADER);
+
+	SC_ID *pdata1 = reinterpret_cast<SC_ID*>(sendData + sizeof(HEADER));
+	pdata1->ID = id;
+
+	for (auto &data : m_vpClientInfo)
+	{
+		if (data)
+		{
+			transmitProcess(sendData, data->getSockID());
+		}
+	}
+
+	return true;
+}
+
+
+//bool CNetworkManager::syncData(void *buf, int id)
+//{
+//	CTOS_SYNC *data = reinterpret_cast<CTOS_SYNC*>((UCHAR*)buf + sizeof(HEADER));
+//
+//	auto Player = m_vpClientInfo[id]->getPlayer();
+//	if (!Player) return false;
+//	Player->Move(data->movedelta);
+//
+//	UCHAR sendData[MAX_PACKET_SIZE] = { 0 };
+//
+//	list<UINT> RemoveIDlist;
+//
+//	HEADER *phead = reinterpret_cast<HEADER*>(sendData);
+//	phead->byPacketID = PAK_SYNC;
+//	phead->ucSize = sizeof(STOC_SYNC) + sizeof(HEADER);
+//
+//	STOC_SYNC *pData = reinterpret_cast<STOC_SYNC*>(sendData + sizeof(HEADER));
+//	pData->ID = id;
+//	pData->position = Player->getPos();
+//	transmitProcess(sendData, id);
+//
+//	for (int i = 0; i < RESERVE_ID_CNT; ++i)
+//	{
+//		if (!m_vpClientInfo[i]) continue;
+//		if (id == i) continue;
+//		if (!inRange(id, i)) continue;
+//
+//		m_vpClientInfo[id]->m_vlLock.lock();
+//		m_vpClientInfo[id]->m_setViewList.insert(i);
+//		m_vpClientInfo[id]->m_vlLock.unlock();
+//
+//		pData->ID = m_vpClientInfo[i]->getSockID();
+//		pData->position = m_vpClientInfo[i]->getPlayer()->getPos();
+//
+//		transmitProcess(sendData, id);
+//	}
+//
+//	m_vpClientInfo[id]->m_vlLock.lock();
+//	for (auto iter : m_vpClientInfo[id]->m_setViewList)
+//	{
+//		if (!m_vpClientInfo[iter]) continue;
+//		if (id == iter) continue;
+//		if (!inRange(id, iter))
+//		{
+//			RemoveIDlist.push_front(iter);
+//			continue;
+//		}
+//
+//		m_vpClientInfo[iter]->m_vlLock.lock();
+//		m_vpClientInfo[iter]->m_setViewList.insert(id);
+//		m_vpClientInfo[iter]->m_vlLock.unlock();
+//
+//		pData->ID = m_vpClientInfo[id]->getSockID();
+//		pData->position = m_vpClientInfo[id]->getPlayer()->getPos();
+//
+//		transmitProcess(sendData, iter);
+//	}
+//	m_vpClientInfo[id]->m_vlLock.unlock();
+//
+//	for (auto iter : RemoveIDlist)
+//	{
+//		m_vpClientInfo[id]->m_vlLock.lock();
+//		m_vpClientInfo[id]->m_setViewList.erase(iter);
+//		m_vpClientInfo[id]->m_vlLock.unlock();
+//
+//		m_vpClientInfo[iter]->m_vlLock.lock();
+//		m_vpClientInfo[iter]->m_setViewList.erase(id);
+//		m_vpClientInfo[iter]->m_vlLock.unlock();
+//
+//		phead->byPacketID = PAK_RMV;
+//		phead->ucSize = sizeof(STOC_ID) + sizeof(HEADER);
+//
+//		STOC_ID *pData2 = reinterpret_cast<STOC_ID*>(sendData + sizeof(HEADER));
+//		pData2->ID = id;
+//		transmitProcess(sendData, iter);
+//
+//		pData2->ID = iter;
+//		transmitProcess(sendData, id);
+//	}
+//	return true;
+//}
+
+void CNetworkManager::transmitProcess(void *buf, int id)
+{
+	SockInfo *psock = new SockInfo;
+	BYTE *paksiz = reinterpret_cast<BYTE*>(buf);
+
+	memcpy(psock->getIOBuf(), buf, *paksiz);
+	psock->setOperationType(OP_TYPE::OP_SEND);
+
+	ZeroMemory(&psock->getOvelappedStruct(), sizeof(WSAOVERLAPPED));
+	psock->getWSABuf().buf = psock->getIOBuf();
+	psock->getWSABuf().len = *paksiz;
+
+	unsigned long IOsize;
+
+	SockInfo* sock = m_vpClientInfo[id];
+	if (!sock)
+		err_display("Wrong Sock access!!");
+
+	int retval = WSASend(sock->getSock(), &psock->getWSABuf(), 1, &IOsize, NULL, &psock->getOvelappedStruct(), NULL);
+	if (retval == SOCKET_ERROR)
+	{
+		int err_code = WSAGetLastError();
+		if (WSA_IO_PENDING != err_code)
+		{
+			assert(WSA_IO_PENDING != err_code && "[CNetworkManager::sendPacket()] WSASend");
+			cout << WSAGetLastError() << endl;
+
+			//로그아웃
+			//Logout(sockid, NULL);
+			return;
+		}
+	}
+	//cout << "패킷 전송 완료" << IOsize << endl;
 }
