@@ -1,9 +1,13 @@
+#pragma once
+#pragma warning(disable: 4819)
+
 // stdafx.h : 자주 사용하지만 자주 변경되지는 않는
 // 표준 시스템 포함 파일 또는 프로젝트 관련 포함 파일이
 // 들어 있는 포함 파일입니다.
 //
 
-#pragma once
+
+
 
 #include "targetver.h"
 
@@ -19,6 +23,9 @@
 #include <math.h>
 #include <list>
 #include <vector>
+#include <WinSock2.h>
+#include <thread>
+#include <Commctrl.h>
 
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3dcompiler.lib")

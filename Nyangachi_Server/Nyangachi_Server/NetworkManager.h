@@ -43,6 +43,7 @@ public:
 	void setPacketBuf(const char* packbuf, int size) { memcpy(m_packetBuf, packbuf, sizeof(size)); }
 	void setStoredPacketSize(const int& size) { m_nstoredPacketSize = size; }
 	void setCurrPacketSize(const int& size) { m_ncurPacketSize = size; }
+	void setOperationType(const OP_TYPE& type) { m_operationType = type; }
 };
 
 class CNetworkManager
@@ -53,6 +54,7 @@ class CNetworkManager
 	SOCKET							m_listenSock;
 	UINT							m_nID;
 	mutex							m_IDLock;
+	OP_TYPE						m_operationType;
 
 public:
 	CNetworkManager();
@@ -75,7 +77,7 @@ public:
 	//스레드 함수
 	bool acceptThread();
 	void workerThread();
-	bool inRange(int a, int b);
+	//bool inRange(int a, int b);
 
 	//패킷 처리 함수
 	bool Login(void *buf, int id);
@@ -84,6 +86,6 @@ public:
 	//오류 출력 함수
 	void err_quit(char *msg);
 	void err_display(char *msg);
-	bool syncData(void *buf, int id);
+	//bool syncData(void *buf, int id);
 };
 

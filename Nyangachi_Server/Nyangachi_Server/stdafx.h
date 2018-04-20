@@ -1,6 +1,7 @@
 #pragma once
 #pragma comment(lib, "ws2_32.lib")
 
+
 #include "targetver.h"
 
 #include <stdio.h>

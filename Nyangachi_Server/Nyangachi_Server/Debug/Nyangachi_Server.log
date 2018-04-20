@@ -1,5 +1,10 @@
-﻿  Player.cpp
+﻿  Nyangachi_Server.cpp
   NetworkManager.cpp
+c:\users\des01\documents\github\nyangachi\nyangachi_server\nyangachi_server\networkmanager.cpp(53): warning C4101: 'tmp' :참조되지 않은 지역 변수입니다.
+c:\users\des01\documents\github\nyangachi\nyangachi_server\nyangachi_server\networkmanager.cpp(108): warning C4996: 'WSASocketA': Use WSASocketW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  c:\program files (x86)\windows kits\10\include\10.0.16299.0\um\winsock2.h(3415): note: 'WSASocketA' 선언을 참조하십시오.
   코드를 생성하고 있습니다...
-MSVCRTD.lib(exe_main.obj) : error LNK2019: _main 외부 기호(참조 위치: "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ) 함수)에서 확인하지 못했습니다.
-C:\Users\DES01\Documents\GitHub\Nyangachi\Nyangachi_Server\Debug\Nyangachi_Server.exe : fatal error LNK1120: 1개의 확인할 수 없는 외부 참조입니다.
+NetworkManager.obj : error LNK2019: "public: bool __thiscall CNetworkManager::Login(void *,int)" (?Login@CNetworkManager@@QAE_NPAXH@Z) 외부 기호(참조 위치: "public: bool __thiscall CNetworkManager::packetProcess(char *,int)" (?packetProcess@CNetworkManager@@QAE_NPADH@Z) 함수)에서 확인하지 못했습니다.
+NetworkManager.obj : error LNK2019: "public: bool __thiscall CNetworkManager::Logout(void *,int)" (?Logout@CNetworkManager@@QAE_NPAXH@Z) 외부 기호(참조 위치: "public: void __thiscall CNetworkManager::workerThread(void)" (?workerThread@CNetworkManager@@QAEXXZ) 함수)에서 확인하지 못했습니다.
+NetworkManager.obj : error LNK2019: "public: bool __thiscall CNetworkManager::syncData(void *,int)" (?syncData@CNetworkManager@@QAE_NPAXH@Z) 외부 기호(참조 위치: "public: bool __thiscall CNetworkManager::packetProcess(char *,int)" (?packetProcess@CNetworkManager@@QAE_NPADH@Z) 함수)에서 확인하지 못했습니다.
+C:\Users\DES01\Documents\GitHub\Nyangachi\Nyangachi_Server\Debug\Nyangachi_Server.exe : fatal error LNK1120: 3개의 확인할 수 없는 외부 참조입니다.
