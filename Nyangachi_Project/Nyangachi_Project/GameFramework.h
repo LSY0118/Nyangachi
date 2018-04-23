@@ -1,53 +1,89 @@
 #pragma once
 
 #include "Timer.h"
-//#include "Common.h"
 
-class CGameObject;
+class CCamera;
+class CScene;
 class CPlayer;
-class CTestObj;
 
 class CGameFramework
 {
+private:
+	CGameTimer m_GameTimer;
+	_TCHAR m_pszFrameRate[50];
+
+	HINSTANCE m_hInstance;
+	HWND m_hWnd;
+
+	int m_nWndClientWidth;
+	int m_nWndClientHeight;
+
+	IDXGIFactory4*		m_pdxgiFactory;
+	IDXGISwapChain3*	m_pdxgiSwapChain;
+	ID3D12Device*		m_pd3dDevice;
+
+	bool	m_bMsaa4xEnable = false;
+	UINT	m_nMsaa4xQualityLevels = 0;
+
+	static const UINT	m_nSwapChainBuffers = 2;
+	UINT				m_nSwapChainBufferIndex;
+
+	ID3D12Resource*			m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
+	ID3D12DescriptorHeap*	m_pd3dRtvDescriptorHeap;
+	UINT					m_nRtvDescriptorIncrementSize;
+
+	ID3D12Resource*			m_pd3dDepthStencilBuffer;
+	ID3D12DescriptorHeap*	m_pd3dDsvDescriptorHeap;
+	UINT					m_nDsvDescriptorIncrementSize;
+
+	ID3D12CommandQueue*			m_pd3dCommandQueue;
+	ID3D12CommandAllocator*		m_pd3dCommandAllocator;
+	ID3D12GraphicsCommandList*	m_pd3dCommandList;
+
+	ID3D12Fence*	m_pd3dFence;
+	UINT64	m_nFenceValues[m_nSwapChainBuffers];
+	HANDLE	m_hFenceEvent;
+
+	CScene*	m_pScene;
+	CCamera* m_pCamera = NULL;
+
 public:
-	CGameFramework(void);
-	~CGameFramework(void);
+	CPlayer* m_pPlayer = NULL;
+	POINT m_ptOldCursorPos;
+
+#if defined(_DEBUG)
+	ID3D12Debug*	m_pd3dDebugController;
+#endif
+
+public:
+	CGameFramework();
+	~CGameFramework();
 
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 	void OnDestroy();
 
-	void BuildFrameBuffer();
+	void OnResizeBackBuffers();
+
+	void CreateSwapChain();
+	void CreateDirect3DDevice();
+	void CreateRtvAndDsvDescriptorHeaps();
+	void CreateCommandQueueAndList();
+
 	void BuildObjects();
-	void ReleaseObject();
-	void ClearFrameBuffer(DWORD dwColor);
-	void PresentFrameBuffer();
+	void ReleaseObjects();
 
-	void FrameAdvance();	
-	void AnimateObjects();
+	void CreateRenderTargetView();
+	void CreateDepthStencilView();
+
 	void ProcessInput();
+	void AnimateObjects();
+	void FrameAdvance();
 
-private:
-	HINSTANCE	m_hInstance;
-	HWND		m_hWnd;
-	HDC			m_hDCFrameBuffer;
-	HBITMAP		m_hBitmapFrameBuffer;
-	bool		m_bActive;
+	void MoveToNextFrame();
 
-	CGameTimer  m_GameTimer;
-	_TCHAR		m_pszFrameRate[50];
-	
-	//int				m_nObjects;
-	//list<CGameObject*>	m_pObjects;
-	//FbxManager* m_pfbxMgr = NULL;
-	//FbxScene*	m_pfbxScene = NULL;
+	void WaitForGpuComplete();
 
-	CPlayer*		m_pPlayer;
-
-	/************************************test*************************************/
-	CTestObj*		m_pObj;
-	/*****************************************************************************/
-	
-public:
-	POINT	m_ptOldCursorPos;
+	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK OnprocessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 };
-

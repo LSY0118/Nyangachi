@@ -6,15 +6,14 @@ CGameTimer::CGameTimer()
 {
 	if (::QueryPerformanceFrequency((LARGE_INTEGER*)&m_nPerformanceFrequency))
 	{
-		m_bHardwareHalsPerformanceCounter = TRUE;
+		m_bHardwareHasPerformanceCounter = TRUE;
 		::QueryPerformanceCounter((LARGE_INTEGER*)&m_nLastTime);
 		m_fTimeScale = 1.f / m_nPerformanceFrequency;
 	}
 	else
 	{
-		m_bHardwareHalsPerformanceCounter = FALSE;
+		m_bHardwareHasPerformanceCounter = FALSE;
 		m_nLastTime = ::timeGetTime();
-
 		m_fTimeScale = 0.001f;
 	}
 
@@ -29,9 +28,42 @@ CGameTimer::~CGameTimer()
 {
 }
 
+void CGameTimer::Start()
+{
+	__int64 nPerformanceCounter;
+	::QueryPerformanceCounter((LARGE_INTEGER*)&nPerformanceCounter);
+	if (m_bStopped)
+	{
+		m_nPausedTime += (nPerformanceCounter - m_nStopTime);
+		m_nLastTime = nPerformanceCounter;
+		m_nStopTime = 0;
+		m_bStopped = false;
+	}
+}
+
+void CGameTimer::Stop()
+{
+	if (!m_bStopped)
+	{
+		::QueryPerformanceCounter((LARGE_INTEGER*)&m_nStopTime);
+		m_bStopped = true;
+	}
+}
+
+void CGameTimer::Reset()
+{
+	__int64 nPerformanceCounter;
+	::QueryPerformanceCounter((LARGE_INTEGER*)&nPerformanceCounter);
+
+	m_nBaseTime = nPerformanceCounter;
+	m_nLastTime = nPerformanceCounter;
+	m_nStopTime = 0;
+	m_bStopped = false;
+}
+
 void CGameTimer::Tick(float fLockFPS)
 {
-	if (m_bHardwareHalsPerformanceCounter)
+	if (m_bHardwareHasPerformanceCounter)
 	{
 		::QueryPerformanceCounter((LARGE_INTEGER*)&m_nCurrentTime);
 	}
@@ -46,7 +78,7 @@ void CGameTimer::Tick(float fLockFPS)
 	{
 		while (fTimeElapsed < (1.f / fLockFPS))
 		{
-			if (m_bHardwareHalsPerformanceCounter)
+			if (m_bHardwareHasPerformanceCounter)
 			{
 				::QueryPerformanceCounter((LARGE_INTEGER*)&m_nCurrentTime);
 			}
@@ -65,7 +97,7 @@ void CGameTimer::Tick(float fLockFPS)
 	{
 		::memmove(&m_fFrameTime[1], m_fFrameTime, (MAX_SAMPLE_COUNT - 1) * sizeof(float));
 		m_fFrameTime[0] = fTimeElapsed;
-		if (m_nSampleCount < MAX_SAMPLE_COUNT) 
+		if (m_nSampleCount < MAX_SAMPLE_COUNT)
 			m_nSampleCount++;
 	}
 
@@ -100,4 +132,12 @@ unsigned long CGameTimer::GetFrameRate(LPTSTR lpszString, int nCharacters)
 float CGameTimer::GetTimeElapsed()
 {
 	return m_fTimeElapsed;
+}
+
+float CGameTimer::GetTotalTime()
+{
+	if (m_bStopped)
+		return(float(((m_nStopTime - m_nPausedTime) - m_nBaseTime) * m_fTimeScale));
+
+	return(float(((m_nCurrentTime - m_nPausedTime) - m_nBaseTime) * m_fTimeScale));
 }

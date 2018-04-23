@@ -27,6 +27,7 @@
 
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
@@ -40,7 +41,11 @@ using namespace DirectX::PackedVector;
 
 #define FRAME_BUFFER_WIDTH 640
 #define FRAME_BUFFER_HEIGHT 480
+#define RANDOM_COLOR XMFLOAT4(rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX))
 
+extern ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nBytes,
+	D3D12_HEAP_TYPE d3dHeapType = D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATES d3dResourceState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
+	ID3D12Resource** ppd3dUploadBuffer = NULL);
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 
 namespace Vector3

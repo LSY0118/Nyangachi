@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include <fbxsdk.h>
 
 class FBXContext
 {
@@ -35,3 +35,16 @@ public:
 	bool OnDisplay();
 };
 
+
+void MatrixScale(FbxAMatrix& fbxmtxSrcMatrix, double pValue);
+void MatrixAddToDiagonal(FbxAMatrix& fbxmtxSrcMatrix, double pValue);
+void MatrixAdd(FbxAMatrix& fbxmtxDstMatrix, FbxAMatrix& fbxmtxSrcMatrix);
+FbxAMatrix GetAttributeNodeTransform(FbxNode *pfbxNode);
+void ComputeClusterDeformation(FbxAMatrix& fbxmtxAttributeGlobalTransform, FbxMesh *pfbxMesh, FbxCluster *pfbxCluster, FbxTime rfbxTime, FbxAMatrix& fbxmtxVertexTransform);
+void ComputeLinearDeformation(FbxAMatrix& fbxmtxAttributeGlobalTransform, FbxMesh *pfbxMesh, FbxTime& rfbxTime, FbxVector4 *pfbxvControlPoints);
+void ComputeDualQuaternionDeformation(FbxAMatrix& fbxmtxAttributeGlobalTransform, FbxMesh *pfbxMesh, FbxTime& rfbxTime, FbxVector4 *pfbxvControlPoints);
+void ComputeSkinDeformation(FbxAMatrix& fbxmtxAttributeGlobalTransform, FbxMesh *pfbxMesh, FbxTime& rfbxTime, FbxVector4 *pfbxvControlPoints);
+void DrawMesh(FbxNode *pfbxNode, FbxTime& rfbxTime, FbxAnimLayer *pfbxAnimLayer, FbxAMatrix& fbxmtxAttributeGlobalTransform);
+void DrawNull(FbxAMatrix& fbxmtxAttributeGlobalTransform);
+void DrawNode(FbxNode *pfbxNode, FbxTime& rfbxTime, FbxAnimLayer *pfbxAnimLayer, FbxAMatrix& fbxmtxAttributeGlobalTransform);
+void DrawNodeRecursive(FbxNode *pfbxNode, FbxTime& rfbxTime, FbxAnimLayer *pfbxAnimLayer, FbxAMatrix& fbxmtxWorldTransform);

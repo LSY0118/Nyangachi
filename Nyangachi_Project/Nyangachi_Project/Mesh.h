@@ -1,70 +1,70 @@
 #pragma once
 
-class CCamera;
-
 class CVertex
 {
-public:
-	CVertex(){}
-	CVertex(float x, float y, float z) { m_xmf3Position = XMFLOAT3(x, y, z); }
+protected:
+	XMFLOAT3 m_xmf3Position;
 
-	XMFLOAT3	m_xmf3Position;
+public:
+	CVertex() { m_xmf3Position = XMFLOAT3(0.f, 0.f, 0.f); }
+	CVertex(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
+	~CVertex() {}
 };
 
-class CPolygon
+class CDiffusedVertex : public CVertex
 {
+protected:
+	XMFLOAT4 m_xmf4Diffuse;
+
 public:
-	CPolygon(int nVertices);
-	virtual ~CPolygon();
-
-	int			m_nVertices;
-	CVertex*	m_pVertices;
-
-	void SetVertex(int nIndex, CVertex& vertex);
-	void Draw(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera* pCamera);
+	CDiffusedVertex() { m_xmf3Position = XMFLOAT3(0.f, 0.f, 0.f); m_xmf4Diffuse = XMFLOAT4(0.f, 0.f, 0.f, 0.f); }
+	CDiffusedVertex(float x, float y, float z, XMFLOAT4 xmf4Diffuse) { m_xmf3Position = XMFLOAT3(x, y, z); m_xmf4Diffuse = xmf4Diffuse; }
+	CDiffusedVertex(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Diffuse) { m_xmf3Position = xmf3Position; m_xmf4Diffuse = xmf4Diffuse; }
+	~CDiffusedVertex() {}
 };
 
 class CMesh
 {
 public:
-	CMesh(int nPolygons);
+	CMesh();
+	CMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual ~CMesh();
 
 private:
-	int		m_nReferences;
-	int		m_nPolygons;
-	CPolygon**	m_ppPolygons;
+	int m_nReferences = 0;
 
 public:
 	void AddRef() { m_nReferences++; }
-	void Release() { m_nReferences--; if (m_nReferences <= 0) delete this; }
+	void Release() { if (--m_nReferences <= 0) delete this; }
+	void ReleaseUploadBuffers();
+
+protected:
+	ID3D12Resource* m_pd3dVertexBuffer = NULL;
+	ID3D12Resource* m_pd3dVertexUploadBuffer = NULL;
+	ID3D12Resource* m_pd3dIndexBuffer = NULL;
+	ID3D12Resource* m_pd3dIndexUploadBuffer = NULL;
+
+	D3D12_VERTEX_BUFFER_VIEW m_d3dVertexBufferView;
+	D3D12_INDEX_BUFFER_VIEW m_d3dIndexBufferView;
+
+	D3D12_PRIMITIVE_TOPOLOGY m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	UINT m_nSlot = 0;
+	UINT m_nVertices = 0;
+	UINT m_nStride = 0;
+	UINT m_nOffset = 0;
+	UINT m_nIndices = 0;
+	UINT m_nStartIndex = 0;
+	UINT m_nBaseVertex = 0;
 
 public:
-	void SetPolygon(int nIndex, CPolygon *pPolygon);
-	virtual void Render(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera *pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommadList);
 };
 
-class CCubeMesh : public CMesh
+
+class CAirPlaneMeshDiffused : public CMesh
 {
 public:
-	CCubeMesh(float fWidth = 1.0f, float fHeight = 1.0f, float fDepth = 1.0f);
-	virtual ~CCubeMesh();
-
-public:
-	void Render(HDC hDCFrameBuffer, XMFLOAT4X4& xm4x4Transform, CCamera* pCamera);
+	CAirPlaneMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 20.f, float fHeight = 20.f, float fDepth = 4.f, XMFLOAT4 xmf4Color = XMFLOAT4(1.f, 1.f, 0.f, 0.f));
+	virtual ~CAirPlaneMeshDiffused();
 };
-
-class CWallMesh : public CMesh
-{
-public:
-	CWallMesh(float fWidth = 4.0f, float fHeight = 4.0f, float fDepth = 4.0f);
-	virtual ~CWallMesh();
-};
-
-class CAirplaneMesh : public CMesh
-{
-public:
-	CAirplaneMesh(float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 4.0f);
-	virtual ~CAirplaneMesh();
-};
-

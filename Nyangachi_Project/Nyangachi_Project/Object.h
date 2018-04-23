@@ -12,129 +12,57 @@
 
 #define DegreeToRadian(x)	((x)*3.1415926535/180.0)
 
+class CShader;
+class FBXContext;
+
 class CGameObject
 {
 public:
-	CGameObject(CMesh *pMesh);
 	CGameObject();
 	virtual ~CGameObject();
 
-public:
-	CMesh					*m_pMesh;
-	XMFLOAT4X4				m_xmf4x4World;
+private:
+	int m_nReferences = 0;
 
+public:
+	void AddRef() { m_nReferences++; }
+	void Release() { if (--m_nReferences <= 0) delete this; }
+
+protected:
+	XMFLOAT4X4 m_xmf4x4World;
+	CMesh *m_pMesh = NULL;
+	CShader* m_pShader = NULL;
+
+public:
 	BoundingOrientedBox		m_xmOOBB;
 	BoundingOrientedBox		m_xmOOBBTransformed;
-	CGameObject				*m_pCollider;
-
-	DWORD					m_dwColor;
-
-	XMFLOAT3				m_xmf3MovingDirection;
-	float					m_fMovingSpeed;
-	float					m_fMovingRange;
-
-	XMFLOAT3				m_xmf3RotationAxis;
-	float					m_fRotationSpeed;
-	float					m_bLive;
 
 public:
-	void SetMesh(CMesh *pMesh) { m_pMesh = pMesh; if (pMesh) pMesh->AddRef(); }
-	void SetColor(DWORD dwColor) { m_dwColor = dwColor; }
-	void SetPosition(float x, float y, float z);
-	void SetPosition(XMFLOAT3& xmf3Position);
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseShaderVariables();
 
-	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
+	virtual void SetMesh(CMesh* pMesh);
+	virtual void SetShader(CShader* pShader);
 
-	void SetMovingDirection(XMFLOAT3& xmf3MovingDirection) { m_xmf3MovingDirection = Vector3::Normalize(xmf3MovingDirection); }
-	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
-	void SetMovingRange(float fRange) { m_fMovingRange = fRange; }
+	virtual void Animate(float fTimeElapsed);
 
-	void SetRotationAxis(XMFLOAT3& xmf3RotationAxis) { m_xmf3RotationAxis = Vector3::Normalize(xmf3RotationAxis); }
-	void SetRotationSpeed(float fSpeed) { m_fRotationSpeed = fSpeed; }
-
-	void MoveStrafe(float fDistance = 1.0f);
-	void MoveUp(float fDistance = 1.0f);
-	void MoveForward(float fDistance = 1.0f);
-	void Move(XMFLOAT3& vDirection, float fSpeed);
-
-	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
-	void Rotate(XMFLOAT3& xmf3Axis, float fAngle);
-
-	DWORD GetColor() { return m_dwColor; }
+	virtual void OnPrepareRender();
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetLook();
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
 
-	virtual void Animate();
-	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
-};
-
-class CPlayer : public CGameObject
-{
-public:
-	CPlayer();
-	virtual ~CPlayer();
-
-	XMFLOAT3					m_xmf3Position;
-	XMFLOAT3					m_xmf3Right;
-	XMFLOAT3					m_xmf3Up;
-	XMFLOAT3					m_xmf3Look;
-
-	XMFLOAT3					m_xmf3CameraOffset;
-	XMFLOAT3					m_xmf3Velocity;
-	float						m_fFriction;
-
-	float           			m_fPitch;
-	float           			m_fYaw;
-	float           			m_fRoll;
-
-	CCamera						*m_pCamera;
-
 	void SetPosition(float x, float y, float z);
-	void Move(DWORD dwDirection, float fDistance);
-	void Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity);
-	void Move(float x, float y, float z);
-	void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
-	void SetCameraOffset(XMFLOAT3& xmf3CameraOffset);
-	void Update(float fTimeElapsed = 0.016f);
+	void SetPosition(XMFLOAT3 xmf3Position);
+	void SetOOBB(XMFLOAT3& xmCenter, XMFLOAT3& xmExtents, XMFLOAT4& xmOrientation) { m_xmOOBBTransformed = m_xmOOBB = BoundingOrientedBox(xmCenter, xmExtents, xmOrientation); }
 
-	XMFLOAT3 GetMovingDirection();
-
-	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera);
-};
-
-class CTestObj : public CGameObject
-{
-public:
-	CTestObj() {};
-	virtual ~CTestObj() {};
-
-	XMFLOAT3					m_xmf3Position;
-	XMFLOAT3					m_xmf3Right;
-	XMFLOAT3					m_xmf3Up;
-	XMFLOAT3					m_xmf3Look;
-
-	XMFLOAT3					m_xmf3CameraOffset;
-	XMFLOAT3					m_xmf3Velocity;
-	float						m_fFriction;
-
-	float           			m_fPitch;
-	float           			m_fYaw;
-	float           			m_fRoll;
-
-	CCamera						*m_pCamera;
-
-	virtual void Render(HDC hDCFrameBuffer, CCamera *pCamera)
-	{
-		XMFLOAT4X4 xm4x4Transform = Matrix4x4::Multiply(m_xmf4x4World, pCamera->m_xmf4x4ViewProject);
-		HPEN hPen = ::CreatePen(PS_SOLID, 0, m_dwColor);
-		HPEN hOldPen = (HPEN)::SelectObject(hDCFrameBuffer, hPen);
-
-		if (m_pMesh) m_pMesh->Render(hDCFrameBuffer, xm4x4Transform, pCamera);
-
-		::SelectObject(hDCFrameBuffer, hOldPen);
-		::DeleteObject(hPen);
-	}
+	void MoveStrafe(float fDistance = 1.f);
+	void MoveUp(float fDistance = 1.f);
+	void MoveForward(float fDistance = 1.f);
+	void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
+	void Rotate(float fPitch = 10.f, float fYaw = 10.f, float fRoll = 10.f);
+	void ReleaseUploadBuffers();
 };
