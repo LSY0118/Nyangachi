@@ -143,31 +143,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-	case WM_KEYDOWN:
-		switch (wParam)
-		{
-		case VK_ESCAPE:
-			PostQuitMessage(0);
-			return 0;
-		}
-		break;
-
+	case WM_SIZE:
 	case WM_LBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-		SetCapture(hWnd);
-		GetCursorPos(&gGameFramework.m_ptOldCursorPos);
-		break;
-
 	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
-		ReleaseCapture();
+	case WM_MOUSEMOVE:
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+		gGameFramework.OnprocessingWindowMessage(hWnd, message, wParam, lParam);
 		break;
 
 	case WM_DESTROY:
-		PostQuitMessage(0);
+		::PostQuitMessage(0);
 		break;
+
 	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
+		return (::DefWindowProc(hWnd, message, wParam, lParam));
 	}
 	return 0;
 }
