@@ -6,6 +6,8 @@ class CCamera;
 class CScene;
 class CPlayer;
 
+enum SCENE_TYPE { SCENE_LOGO, SCENE_LOGIN, SCENE_INGAME, SCENE_END };
+
 class CGameFramework
 {
 private:
@@ -44,6 +46,7 @@ private:
 	UINT64	m_nFenceValues[m_nSwapChainBuffers];
 	HANDLE	m_hFenceEvent;
 
+	SCENE_TYPE m_nCurrentScene;
 	CScene*	m_pScene;
 	CCamera* m_pCamera = NULL;
 
