@@ -11,7 +11,7 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 CGameFramework gGameFramework;
 CHAR gServerIP[MAX_LOADSTRING];
-CNetworkManager gNetwork;
+//CNetworkManager gNetwork;
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -27,7 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-	gNetwork.initNetwork();
+	//네트워크
+	//gNetwork.initNetwork();
 
     // TODO: 여기에 코드를 입력합니다.
 
@@ -155,11 +156,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ZeroMemory(gServerIP, MAX_LOADSTRING);
 
 		DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, reinterpret_cast<DLGPROC>(DlgProc));
-
-		gNetwork.connectServer(gServerIP, hWnd);
+		// 네트워크
+		//gNetwork.connectServer(gServerIP, hWnd);
 		break;
 	case WM_SOCKET:
-		gNetwork.transmitProcess(hWnd, message, wParam, lParam);
+		// 네트워크
+		//gNetwork.transmitProcess(hWnd, message, wParam, lParam);
 		break;
 	case WM_SIZE:
 	case WM_LBUTTONDOWN:
