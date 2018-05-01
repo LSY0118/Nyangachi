@@ -10,9 +10,9 @@
 #include "Object.h"
 #include "Camera.h"
 
-class CPlayer
-	:public CGameObject
+class CPlayer : public CGameObject
 {
+	BYTE		m_byState;
 protected:
 	XMFLOAT3 m_xmf3Position;
 	XMFLOAT3 m_xmf3Right;
@@ -81,6 +81,14 @@ public:
 
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+
+	// 네트워크
+	//POINT& getPos() { return m_Position; }
+	BYTE& getState() { return m_byState; }
+
+	//void setPos(const POINT& pos) { m_Position = pos; }
+	void setState(const BYTE &state) { m_byState = state; }
+	//void Move(POINT& posDelta);
 };
 
 class CAirplanePlayer : public CPlayer

@@ -1,9 +1,7 @@
-// NyangachiProject.cpp: 응용 프로그램의 진입점을 정의합니다.
-//
-
 #include "stdafx.h"
 #include "NyangachiProject.h"
 #include "GameFramework.h"
+#include "NetworkManager.h"
 
 #define MAX_LOADSTRING 100
 
@@ -12,12 +10,15 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 CGameFramework gGameFramework;
+CHAR gServerIP[MAX_LOADSTRING];
+CNetworkManager gNetwork;
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK DlgProc(HWND hWndDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -26,6 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+	gNetwork.initNetwork();
 
     // TODO: 여기에 코드를 입력합니다.
 
@@ -141,8 +143,24 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static POINT deltapos;
+	static HBITMAP backBitmap = NULL, hOldBitmap;
+	static HBITMAP hBit, hBit1, hBit2;
+	static HDC hdc, backMemDC, MemDC;
+	static thread *th;
+	PAINTSTRUCT ps;
 	switch (message)
 	{
+	case WM_CREATE:
+		ZeroMemory(gServerIP, MAX_LOADSTRING);
+
+		DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, reinterpret_cast<DLGPROC>(DlgProc));
+
+		gNetwork.connectServer(gServerIP, hWnd);
+		break;
+	case WM_SOCKET:
+		gNetwork.transmitProcess(hWnd, message, wParam, lParam);
+		break;
 	case WM_SIZE:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
@@ -182,4 +200,50 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+
+LRESULT CALLBACK DlgProc(HWND hWndDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	DWORD ipaddr;
+	WCHAR question[100];
+
+	switch (Msg)
+	{
+	case WM_INITDIALOG:
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+			ZeroMemory(gServerIP, 100);
+			SendMessage(GetDlgItem(hWndDlg, IDC_IPADDRESS1), IPM_GETADDRESS, 0, (LPARAM)&ipaddr);
+
+
+			sprintf_s(gServerIP, "%d.%d.%d.%d"
+				, FIRST_IPADDRESS(ipaddr)
+				, SECOND_IPADDRESS(ipaddr)
+				, THIRD_IPADDRESS(ipaddr)
+				, FOURTH_IPADDRESS(ipaddr));
+
+
+			//wsprintf(question, L"[ %d.%d.%d.%d ]?", FIRST_IPADDRESS(ipaddr)
+			//	, SECOND_IPADDRESS(ipaddr)
+			//	, THIRD_IPADDRESS(ipaddr)
+			//	, FOURTH_IPADDRESS(ipaddr));
+
+			//auto result = MessageBox(hWndDlg, question, L"서버 IP", MB_YESNO);
+
+			//if (result == IDYES) EndDialog(hWndDlg, 0);
+			EndDialog(hWndDlg, 0);
+		}
+		break;
+
+	case WM_CLOSE:
+		PostQuitMessage(0);
+		break;
+	}
+
+	return FALSE;
 }

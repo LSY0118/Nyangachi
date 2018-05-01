@@ -1,0 +1,11 @@
+﻿  NyangachiProject.cpp
+NyangachiProject.cpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+NyangachiProject.cpp(151): warning C4101: 'ps' :참조되지 않은 지역 변수입니다.
+NyangachiProject.cpp(209): warning C4101: 'question' :참조되지 않은 지역 변수입니다.
+  코드를 생성하고 있습니다.
+  64 of 689 functions ( 9.3%) were compiled, the rest were copied from previous compilation.
+    3 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  Nyangachi_Project.vcxproj -> D:\구민영\Nyangachi\Nyangachi_Project\Release\Nyangachi_Project.exe
+  Nyangachi_Project.vcxproj -> D:\구민영\Nyangachi\Nyangachi_Project\Release\Nyangachi_Project.pdb (Full PDB)
