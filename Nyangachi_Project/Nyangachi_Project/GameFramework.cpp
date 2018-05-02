@@ -7,7 +7,9 @@
 CGameFramework::CGameFramework()
 {
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
-
+	
+	m_nCurrentScene = SCENE_LOGO;
+	
 	m_pdxgiFactory = NULL;
 	m_pdxgiSwapChain = NULL;
 	m_pd3dDevice = NULL;
@@ -36,7 +38,11 @@ CGameFramework::CGameFramework()
 
 	for (int i = 0; i < m_nSwapChainBuffers; i++)
 		m_nFenceValues[i] = 0;
-	m_pScene = NULL;
+
+	for(int i = 0; i < SCENE_END; ++i)
+	{ 
+		m_pScene[i] = NULL;
+	}
 }
 
 CGameFramework::~CGameFramework()
@@ -281,33 +287,36 @@ void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
-	m_pScene = new CScene();
-	if (m_pScene)
-		m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
-
-	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	m_pScene[m_nCurrentScene] = new CLoginScene();
+	if (m_pScene[m_nCurrentScene])
+		m_pScene[m_nCurrentScene]->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+/*
+	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene[m_nCurrentScene]->GetGraphicsRootSignature());
 	m_pPlayer = pAirplanePlayer;
 	m_pCamera = m_pPlayer->GetCamera();
-
+*/
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
 
-	if (m_pScene)
-		m_pScene->ReleaseUploadBuffers();
+	if (m_pScene[m_nCurrentScene])
+		m_pScene[m_nCurrentScene]->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
 }
 
 void CGameFramework::ReleaseObjects()
 {
-	if (m_pScene)
-		m_pScene->ReleaseObjects();
+	for (int i = 0; i < SCENE_END; ++i)
+	{
+		if (m_pScene[i])
+			m_pScene[i]->ReleaseObjects();
 
-	if (m_pScene)
-		delete m_pScene;
+		if (m_pScene[i])
+			delete m_pScene[i];
+	}
 }
 
 void CGameFramework::ProcessInput()
@@ -336,7 +345,7 @@ void CGameFramework::ProcessInput()
 		::SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 	}
 
-	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
+/*	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 	{
 		if (cxDelta || cyDelta)
 		{
@@ -349,14 +358,15 @@ void CGameFramework::ProcessInput()
 			m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	*/
 }
 
 void CGameFramework::AnimateObjects()
 {
-	if (m_pScene)
+	if (m_pScene[m_nCurrentScene])
 	{
-		m_pScene->AnimateObjects(m_GameTimer.GetTimeElapsed());
-		m_pScene->ContainObjects(m_pd3dDevice, m_pd3dCommandList, m_pPlayer);
+		m_pScene[m_nCurrentScene]->AnimateObjects(m_GameTimer.GetTimeElapsed());
+		m_pScene[m_nCurrentScene]->ContainObjects(m_pd3dDevice, m_pd3dCommandList, m_pPlayer);
 	}
 }
 
@@ -392,15 +402,16 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, FALSE, &d3dDsvCPUDescriptorHandle);
 
 	// = 렌더링 코드는 이곳에 추가한다. ===========================================================================================================
-	if (m_pScene)
-		m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pScene[m_nCurrentScene])
+		m_pScene[m_nCurrentScene]->Render(m_pd3dCommandList, m_pCamera);
 
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.f, 0, 0, NULL);
 #endif
-
+	/*
 	if (m_pPlayer)
 		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	*/
 	//===========================================================================================================================================
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -486,7 +497,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;
 
 		case VK_F9:

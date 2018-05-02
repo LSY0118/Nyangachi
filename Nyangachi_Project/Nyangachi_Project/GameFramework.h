@@ -47,7 +47,7 @@ private:
 	HANDLE	m_hFenceEvent;
 
 	SCENE_TYPE m_nCurrentScene;
-	CScene*	m_pScene;
+	CScene*	m_pScene[SCENE_END];
 	CCamera* m_pCamera = NULL;
 
 public:
