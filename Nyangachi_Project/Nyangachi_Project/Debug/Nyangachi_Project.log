@@ -1,1 +1,21 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Platforms\Win32\PlatformToolsets\v141\Toolset.targets(34,5): error MSB8036: Windows SDK 버전 10.0.16299.0을(를) 찾을 수 없습니다. 필요한 버전의 Windows SDK를 설치하거나, 솔루션을 마우스 오른쪽 단추로 클릭하고 [솔루션 대상 변경]을 선택하거나 프로젝트 속성 페이지에서 SDK 버전을 변경하세요.
+﻿  stdafx.cpp
+d:\구민영\nyangachi\nyangachi_project\nyangachi_project\stdafx.cpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  NyangachiProject.cpp
+d:\구민영\nyangachi\nyangachi_project\nyangachi_project\nyangachiproject.cpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+d:\구민영\nyangachi\nyangachi_project\nyangachi_project\nyangachiproject.cpp(217): warning C4101: 'question' :참조되지 않은 지역 변수입니다.
+  GameFramework.cpp
+  Timer.cpp
+  Shader.cpp
+  SelectRoom.cpp
+  Scene.cpp
+  Player.cpp
+  Object.cpp
+  NetworkManager.cpp
+d:\구민영\nyangachi\nyangachi_project\nyangachi_project\networkmanager.cpp(237): warning C4101: 'selcRoom' :참조되지 않은 지역 변수입니다.
+  Mesh.cpp
+  FBXContext.cpp
+  Camera.cpp
+  코드를 생성하고 있습니다...
+  Common.cxx
+SelectRoom.obj : error LNK2001: "public: virtual void __thiscall CSelectRoom::updateRoom(struct ROOM_INFO)" (?updateRoom@CSelectRoom@@UAEXUROOM_INFO@@@Z) 외부 기호를 확인할 수 없습니다.
+D:\구민영\Nyangachi\Nyangachi_Project\Debug\Nyangachi_Project.exe : fatal error LNK1120: 1개의 확인할 수 없는 외부 참조입니다.

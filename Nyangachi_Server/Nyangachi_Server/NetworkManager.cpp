@@ -52,7 +52,8 @@ void CNetworkManager::err_quit(char *msg)
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR)&lpMsgBuf, 0, NULL);
 
-	MessageBox(NULL, (LPCTSTR)lpMsgBuf, msg, MB_ICONERROR);
+	MessageBox(NULL, (LPCTSTR)lpMsgBuf, (LPCWSTR)msg, MB_ICONERROR);	// 디버그
+	//MessageBox(NULL, (LPCTSTR)lpMsgBuf, msg, MB_ICONERROR);			// 릴리즈
 	LocalFree(lpMsgBuf);
 	exit(1);
 }

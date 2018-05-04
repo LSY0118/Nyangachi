@@ -9,7 +9,9 @@
 #define		PAK_ID					1
 #define		PAK_REG					2
 #define		PAK_RMV					3
+#define		PAK_PIKROOM				4
 #define		MAX_CLIENT				100
+#define		ROOM_MAX_PLAYER			6
 
 #pragma pack(push, 1)
 
@@ -20,9 +22,13 @@ struct HEADER {
 
 struct ROOM_INFO {
 	BYTE		R_RoomNum;
-	BYTE		R_RoomState		: 2;
-	BYTE		R_PlayerNum		: 3;
-	BYTE		R_Ready			: 1;
+	BYTE		R_RoomState;
+	BYTE		R_PlayerNum;
+};
+
+struct SC_CONNECT {
+	HEADER				header;
+	USHORT				nPlayerID;
 };
 
 struct SC_LOGIN {
@@ -48,6 +54,12 @@ struct SC_ID
 struct CS_ID
 {
 	BYTE	ID;
+};
+
+struct CS_PICKROOM {
+	HEADER	header;
+	USHORT	playerID;
+	BYTE	byRoom;
 };
 
 #pragma pack(pop)
