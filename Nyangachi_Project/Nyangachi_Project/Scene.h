@@ -2,6 +2,8 @@
 
 #include "Timer.h"
 #include "Shader.h"
+#include "NetworkManager.h"
+#include "..\..\Nyangachi_Server\Nyangachi_Server\Protocol.h"
 
 class CCamera;
 class CPlayer;
@@ -33,6 +35,8 @@ protected:
 	int m_nShaders = 0;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
+
+	CNetworkManager		*m_pNetworkManager;
 };
 
 class CLoginScene : public CScene

@@ -93,9 +93,16 @@ void CNetworkManager::connectServer(CHAR *ipstr, HWND hWnd)
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	int retval = connect(m_ClientSock, reinterpret_cast<SOCKADDR *>(&serveraddr), sizeof(serveraddr));
+	
+	if (retval != SOCKET_ERROR) {
+		SC_CONNECT connect;
+		recv(m_ClientSock, reinterpret_cast<char*>(&connect), sizeof(connect), 0);
+		m_ClientID = connect.nPlayerID;
+		retval = WSAAsyncSelect(m_ClientSock, hWnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE | FD_CONNECT);
+	}
+
 	if (retval == SOCKET_ERROR) err_quit(L"connect()");
 
-	retval = WSAAsyncSelect(m_ClientSock, hWnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
 	if (retval == SOCKET_ERROR) err_quit(L"WSAAsyncSelect()");
 
 	cout << "서버와 연결 완료" << endl;
@@ -231,6 +238,15 @@ void CNetworkManager::transmitProcess(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		PostQuitMessage(0);
 		break;
 	}
+}
+
+void CNetworkManager::sendPickRoom(BYTE roomNum) {
+	CS_PICKROOM pickRoom;
+	pickRoom.header.byPacketID = PAK_PIKROOM;
+	pickRoom.header.ucSize = sizeof(CS_PICKROOM);
+	pickRoom.byRoom = roomNum;
+	pickRoom.playerID = m_ClientID;
+	send(m_ClientSock, reinterpret_cast<const char*>(&pickRoom), pickRoom.header.ucSize, 0);
 }
 
 // 이동 패킷

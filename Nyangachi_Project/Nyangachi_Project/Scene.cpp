@@ -213,6 +213,8 @@ void CLoginScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 
 	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
 	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
+
+	
 }
 
 void CLoginScene::ReleaseObjects()
@@ -244,6 +246,8 @@ void CLoginScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera* pC
 	pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
 	pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pd3dCommandList->DrawInstanced(4, 1, 0, 0);
+
+	
 }
 
 CInGameScene::CInGameScene()
@@ -343,6 +347,8 @@ void CInGameScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandL
 
 	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
 	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
+
+
 }
 
 void CInGameScene::ReleaseObjects()

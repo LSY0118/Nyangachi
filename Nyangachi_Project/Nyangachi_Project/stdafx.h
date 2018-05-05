@@ -1,6 +1,9 @@
 #pragma once
 #pragma warning(disable: 4819)
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+// 콘솔창 띄우기
+#pragma comment(linker, "/entry:wWinMainCRTStartup")
+#pragma comment(linker, "/subsystem:console")
 // stdafx.h : 자주 사용하지만 자주 변경되지는 않는
 // 표준 시스템 포함 파일 또는 프로젝트 관련 포함 파일이
 // 들어 있는 포함 파일입니다.

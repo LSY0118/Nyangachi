@@ -5,6 +5,7 @@
 
 #define MAX_LOADSTRING 100
 
+
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
@@ -154,7 +155,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		ZeroMemory(gServerIP, MAX_LOADSTRING);
-
+		backBitmap = (HBITMAP)LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP1));
 		DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, reinterpret_cast<DLGPROC>(DlgProc));
 		// 네트워크
 		//gNetwork.connectServer(gServerIP, hWnd);
@@ -162,6 +163,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_SOCKET:
 		// 네트워크
 		//gNetwork.transmitProcess(hWnd, message, wParam, lParam);
+		break;
+	case WM_PAINT:
+		hdc = BeginPaint(hWnd, &ps);
+
+		EndPaint(hWnd, &ps);
 		break;
 	case WM_SIZE:
 	case WM_LBUTTONDOWN:

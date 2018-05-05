@@ -63,6 +63,9 @@
     <ClInclude Include="NetworkManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="SelectRoom.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -104,6 +107,9 @@
     <ClCompile Include="NetworkManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="SelectRoom.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NyangachiProject.rc">
@@ -115,6 +121,9 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="NyangachiProject.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\..\Nyangachi_Graphic\UI\ServerSelectScreen\bmp\MainScreen_Background.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

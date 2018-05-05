@@ -169,6 +169,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SelectRoom.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="GameFramework.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SelectRoom.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="GameFramework.cpp" />
@@ -204,6 +206,7 @@
     <ResourceCompile Include="NyangachiProject.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\Nyangachi_Graphic\UI\ServerSelectScreen\bmp\MainScreen_Background.bmp" />
     <Image Include="NyangachiProject.ico" />
     <Image Include="small.ico" />
   </ItemGroup>

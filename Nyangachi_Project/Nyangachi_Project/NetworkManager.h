@@ -26,6 +26,7 @@ public:
 	void transmitProcess(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void packetProcess(CHAR* buf);
 	void sendMovePacket(POINT &deltaPos);
+	void sendPickRoom(BYTE roomNum);
 
 	vector<CPlayer> getPlayerList() { return m_vector; }
 
